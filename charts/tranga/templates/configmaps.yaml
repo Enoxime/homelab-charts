@@ -82,7 +82,7 @@ data:
             rewrite ^/_ipx/_/api/(.*)$ /$1 break;
             proxy_pass http://127.0.0.1:6531;
         }
-        
+
         # redirect server error pages to the static page /504.html
         #
         error_page   404  /404.html;
