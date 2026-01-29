@@ -21,4 +21,15 @@ entries:
     urls:
     - https://github.com/Enoxime/homelab-charts/releases/download/immich-0.2.0/immich-0.2.0.tgz
     version: 0.2.0
-generated: "2026-01-29T02:24:18.747977537Z"
+  tranga:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2026-01-29T03:30:31.554202775Z"
+    description: A Helm chart for Kubernetes
+    digest: 9d0369a0812e83cf0fefc7a71df4ba7ef04172f96930d5792a536e8c11a6b3e0
+    name: tranga
+    type: application
+    urls:
+    - https://github.com/Enoxime/homelab-charts/releases/download/tranga-0.1.0/tranga-0.1.0.tgz
+    version: 0.1.0
+generated: "2026-01-29T03:30:31.554212172Z"
