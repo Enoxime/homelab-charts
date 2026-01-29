@@ -142,7 +142,7 @@ ipp:
   image:
     repository: alangrainger/immich-public-proxy
     pullPolicy: IfNotPresent
-    tag: "1.14.2"
+    tag: "1.15.1"
   podSecurityContext: {}
   securityContext: {}
   publicBaseUrl:
