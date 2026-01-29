@@ -95,7 +95,7 @@ spec:
             - name: API_URL
               value: http://127.0.0.1:6531/api
             - name: NGINX_ENVSUBST_TEMPLATE_DIR
-              value: /doesntexists
+              value: /does-not-exist
           ports:
             - name: http
               containerPort: 8080
