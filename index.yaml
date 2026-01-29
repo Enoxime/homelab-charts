@@ -21,6 +21,18 @@ entries:
     urls:
     - https://github.com/Enoxime/homelab-charts/releases/download/immich-0.2.0/immich-0.2.0.tgz
     version: 0.2.0
+  kavita:
+  - apiVersion: v2
+    appVersion: 0.8.9
+    created: "2026-01-29T03:48:11.263676328Z"
+    description: A Helm chart for deploying Kavita, a digital library and manga/comic
+      reader application
+    digest: 4cfda3ffefd4a273b3da1a41ffc24d17018f0aaa9797360f4c7f5c29db417d53
+    name: kavita
+    type: application
+    urls:
+    - https://github.com/Enoxime/homelab-charts/releases/download/kavita-0.1.0/kavita-0.1.0.tgz
+    version: 0.1.0
   tranga:
   - apiVersion: v2
     appVersion: 1.16.0
@@ -32,4 +44,4 @@ entries:
     urls:
     - https://github.com/Enoxime/homelab-charts/releases/download/tranga-0.1.0/tranga-0.1.0.tgz
     version: 0.1.0
-generated: "2026-01-29T03:30:31.554212172Z"
+generated: "2026-01-29T03:48:11.263684081Z"
