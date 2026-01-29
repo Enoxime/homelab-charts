@@ -1,0 +1,135 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "immich.fullname" . }}-ai
+  labels:
+    type: immich-ai
+    {{- include "immich.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.ai.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "immich.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        type: immich-ai
+        {{- include "immich.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- if and .Values.ai.runtimeClass.enabled .Values.ai.runtimeClass.name }}
+      runtimeClassName: {{ .Values.ai.runtimeClass.name }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "immich.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.ai.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}-ai
+          securityContext:
+            {{- toYaml .Values.ai.securityContext | nindent 12 }}
+          image: "{{ .Values.ai.image.repository }}:{{ .Values.ai.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.ai.image.pullPolicy }}
+          env:
+            {{- if not (empty .Values.redis.password) }}
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.redis.password.name }}
+                  key: {{ .Values.redis.password.key }}
+            {{- end }}
+            {{- if not (empty .Values.postgresql.password) }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgresql.password.name }}
+                  key: {{ .Values.postgresql.password.key }}
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "immich.fullname" . }}-redis-env
+            - configMapRef:
+                name: {{ include "immich.fullname" . }}-database-env
+            - configMapRef:
+                name: {{ include "immich.fullname" . }}-global-env
+          ports:
+            - name: http-ai
+              containerPort: {{ .Values.ai.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: http-ai
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: http-ai
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.ai.resources | nindent 12 }}
+          volumeMounts:
+          {{- if .Values.persistence.enabled }}
+            - name: cache
+              mountPath: /cache
+            - name: config
+              mountPath: /.config
+            - name: caching
+              mountPath: /.cache
+          {{- end }}
+          {{- with .Values.ai.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+      {{- if .Values.persistence.enabled }}
+        - name: cache
+          persistentVolumeClaim:
+            claimName: {{ include "immich.fullname" . }}-ai-cache
+        - name: config
+          persistentVolumeClaim:
+            claimName: {{ include "immich.fullname" . }}-ai-config
+        - name: caching
+          persistentVolumeClaim:
+            claimName: {{ include "immich.fullname" . }}-ai-caching
+      {{- else }}
+        - name: cache
+          emptyDir: {}
+        - name: config
+          emptyDir: {}
+        - name: caching
+          emptyDir: {}
+      {{- end }}
+      {{- with .Values.ai.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ai.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ai.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ai.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
