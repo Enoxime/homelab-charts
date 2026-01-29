@@ -1,0 +1,113 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "immich.fullname" . }}-microsvc
+  labels:
+    type: immich-microsvc
+    {{- include "immich.labels" . | nindent 4 }}
+spec:
+  {{- if and .Values.microservices.runtimeClass.enabled .Values.microservices.runtimeClass.name }}
+  runtimeClassName: {{ .Values.microservices.runtimeClass.name }}
+  {{- end }}
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "immich.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        type: immich-microsvc
+        {{- include "immich.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "immich.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}-microsvc
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            {{- if not (empty .Values.redis.password) }}
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.redis.password.name }}
+                  key: {{ .Values.redis.password.key }}
+            {{- end }}
+            {{- if not (empty .Values.postgresql.password) }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgresql.password.name }}
+                  key: {{ .Values.postgresql.password.key }}
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "immich.fullname" . }}-redis-env
+            - configMapRef:
+                name: {{ include "immich.fullname" . }}-database-env
+            - configMapRef:
+                name: {{ include "immich.fullname" . }}-global-env
+            - configMapRef:
+                name: {{ include "immich.fullname" . }}-microservices-env
+          resources:
+            {{- toYaml .Values.microservices.resources | nindent 12 }}
+          volumeMounts:
+          {{- if .Values.persistence.enabled }}
+            {{- if and .Values.persistence.upload.enabled .Values.persistence.upload.existingClaim.name }}
+            - name: upload
+              mountPath: /usr/src/app/upload
+            {{- end }}
+            {{- if and .Values.persistence.library.enabled .Values.persistence.library.existingClaim.name }}
+            - name: library
+              mountPath: /usr/src/app/library
+            {{- end }}
+          {{- end }}
+          {{- with .Values.microservices.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+      {{- if .Values.persistence.enabled }}
+        {{- if and .Values.persistence.upload.enabled .Values.persistence.upload.existingClaim.name }}
+        - name: upload
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.upload.existingClaim.name }}
+        {{- end }}
+        {{- if and .Values.persistence.library.enabled .Values.persistence.library.existingClaim.name }}
+        - name: library
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.library.existingClaim.name }}
+        {{- end }}
+      {{- end }}
+      {{- with .Values.microservices.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.microservices.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.microservices.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.microservices.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

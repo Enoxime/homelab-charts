@@ -1,0 +1,106 @@
+{{- if .Values.ipp.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "immich.fullname" . }}-public-proxy
+  labels:
+    type: immich-public-proxy
+    {{- include "immich.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "immich.selectorLabels" . | nindent 6 }}
+      type: immich-public-proxy
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        type: immich-public-proxy
+        {{- include "immich.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "immich.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.ipp.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}-public-proxy
+          securityContext:
+            {{- toYaml .Values.ipp.securityContext | nindent 12 }}
+          image: "{{ .Values.ipp.image.repository }}:{{ .Values.ipp.image.tag }}"
+          imagePullPolicy: {{ .Values.ipp.image.pullPolicy }}
+          env:
+            - name: IMMICH_URL
+              value: http://{{ include "immich.fullname" . }}-server:{{ .Values.server.service.port }}
+            {{- if .Values.ipp.publicBaseUrl.enabled }}
+            - name: PUBLIC_BASE_URL
+              value: {{ .Values.ipp.publicBaseUrl.url }}
+            {{- end }}
+          ports:
+            - name: http-ipp
+              containerPort: {{ .Values.ipp.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /share/healthcheck
+              port: http-ipp
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /share/healthcheck
+              port: http-ipp
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 3
+          {{- with .Values.ipp.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+          {{- if .Values.ipp.config.enabled }}
+            - name: ipp-config
+              mountPath: /app/config.json
+              subPath: config.json
+              readOnly: true
+          {{- end }}
+          {{- with .Values.ipp.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+      volumes:
+      {{- if .Values.ipp.config.enabled }}
+        - name: ipp-config
+          configMap:
+            name: {{ include "immich.fullname" . }}-ipp-config
+      {{- end }}
+      {{- with .Values.ipp.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

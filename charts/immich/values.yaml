@@ -1,0 +1,185 @@
+# Default values for immich.
+
+# -- Number of replica. Not tested above 1
+replicaCount: 1
+
+image:
+  repository: ghcr.io/immich-app/immich-server
+  pullPolicy: IfNotPresent
+  # -- Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: false
+  # -- Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  fsGroup: 65532
+
+securityContext: {}
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+timezone: "*1"
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+persistence:
+  enabled: false
+  storageClassName: ""
+  upload:
+    enabled: false
+    size: ""
+    existingClaim:
+      name: ""
+  library:
+    enabled: false
+    size: 15Gi
+    existingClaim:
+      name: ""
+
+# -- Additional volumes on the output Deployment definition.
+volumes: []
+
+# -- Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+ai:
+  image:
+    repository: ghcr.io/immich-app/immich-machine-learning
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+  replicaCount: 1
+  runtimeClass:
+    enabled: false
+    name: ""
+  podSecurityContext: {}
+  securityContext: {}
+  service:
+    type: ClusterIP
+    port: 3003
+  nodeSelector: {}
+  tolerations: []
+  resources: {}
+  # Additional volumes on the output Deployment definition.
+  volumes: []
+  # Additional volumeMounts on the output Deployment definition.
+  volumeMounts: []
+
+microservices:
+  runtimeClass:
+    enabled: false
+    name: ""
+  nodeSelector: {}
+  tolerations: []
+  resources: {}
+  # Additional volumes on the output Deployment definition.
+  volumes: []
+  # Additional volumeMounts on the output Deployment definition.
+  volumeMounts: []
+
+server:
+  service:
+    type: ClusterIP
+    port: 2283
+  # Additional volumes on the output Deployment definition.
+  volumes: []
+  # Additional volumeMounts on the output Deployment definition.
+  volumeMounts: []
+  trustedProxies: ""
+
+# -- Activate immich-public-proxy
+ipp:
+  enabled: false
+  image:
+    repository: alangrainger/immich-public-proxy
+    pullPolicy: IfNotPresent
+    tag: "1.14.2"
+  podSecurityContext: {}
+  securityContext: {}
+  publicBaseUrl:
+    enabled: false
+    # -- http(s)?://public-domain.com
+    url: ""
+  config:
+    enabled: false
+    singleImageGallery: false
+    downloadOriginalPhoto: true
+    allowDownloadAll: 1
+  service:
+    type: ClusterIP
+    port: 3000
+  resources: {}
+  volumeMounts: []
+  volumes: []
+
+postgresql:
+  url: ""
+  hostname: database
+  port: 5432
+  username: postgres
+  databaseName: immich
+  sslMode: disable
+  vectorExtension: ""
+  skipMigrations: false
+  password:
+    name: ""
+    key: ""
+
+redis:
+  url: ""
+  socket: ""
+  hostname: ""
+  port: ""
+  username: ""
+  password:
+    name: ""
+    key: ""

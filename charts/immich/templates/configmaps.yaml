@@ -1,0 +1,83 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "immich.fullname" . }}-redis-env
+  labels:
+    {{- include "immich.labels" . | nindent 4 }}
+data:
+  REDIS_SOCKET: {{ .Values.redis.socket | default "" | quote }}
+  REDIS_HOSTNAME: {{ .Values.redis.hostname | default "redis" | quote }}
+  REDIS_PORT: {{ .Values.redis.port | default "6379" | quote }}
+  REDIS_USERNAME: {{ .Values.redis.username | default "" | quote }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "immich.fullname" . }}-database-env
+  labels:
+    {{- include "immich.labels" . | nindent 4 }}
+data:
+  DB_HOSTNAME: {{ .Values.postgresql.hostname | default "database" | quote }}
+  DB_PORT: {{ .Values.postgresql.port | default "5432" | quote }}
+  DB_USERNAME: {{ .Values.postgresql.username | default "postgres" | quote }}
+  DB_DATABASE_NAME: {{ .Values.postgresql.databaseName | default "immich" | quote }}
+  {{- if not (empty .Values.postgresql.sslMode) }}
+  DB_SSL_MODE: {{ .Values.postgresql.sslMode | default "disable" | quote }}
+  {{- end }}
+  {{- if not (empty .Values.postgresql.vectorExtension) }}
+  DB_VECTOR_EXTENSION: {{ .Values.postgresql.vectorExtension | default "" | quote }}
+  {{- end }}
+  DB_SKIP_MIGRATIONS: {{ .Values.postgresql.skipMigrations | default "false" | quote }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "immich.fullname" . }}-global-env
+  labels:
+    {{- include "immich.labels" . | nindent 4 }}
+data:
+  IMMICH_ENV: production
+  IMMICH_LOG_LEVEL: log
+  IMMICH_MACHINE_LEARNING_URL: http://{{ include "immich.fullname" . }}-ai:3003
+  IMMICH_METRICS: "true"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "immich.fullname" . }}-api-env
+  labels:
+    {{- include "immich.labels" . | nindent 4 }}
+data:
+  {{- if not (empty .Values.server.trustedProxies) }}
+  IMMICH_TRUSTED_PROXIES: {{ .Values.server.trustedProxies }}
+  {{- end }}
+  # see: https://immich.app/docs/administration/jobs-workers/
+  IMMICH_WORKERS_INCLUDE: api
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "immich.fullname" . }}-microservices-env
+  labels:
+    {{- include "immich.labels" . | nindent 4 }}
+data:
+  TZ: {{ .Values.timezone | quote }}
+  # see: https://immich.app/docs/administration/jobs-workers/
+  IMMICH_WORKERS_EXCLUDE: api
+{{- if and .Values.ipp.enabled .Values.ipp.config.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "immich.fullname" . }}-ipp-config
+  labels:
+    {{- include "immich.labels" . | nindent 4 }}
+data:
+  config.json: |
+    {{- toJson (dict "ipp" (dict
+          "singleImageGallery" .Values.ipp.config.singleImageGallery
+          "downloadOriginalPhoto" .Values.ipp.config.downloadOriginalPhoto
+          "allowDownloadAll" .Values.ipp.config.allowDownloadAll
+        )) | nindent 4 }}
+{{- end }}
