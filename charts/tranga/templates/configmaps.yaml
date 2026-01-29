@@ -56,7 +56,6 @@ data:
 
         access_log  /dev/stdout  main;
         error_log  /dev/stderr;
-        
         location / {
             root   /usr/share/nginx/html;
             index  index.html index.htm;
