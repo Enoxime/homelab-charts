@@ -1,0 +1,138 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "searxng.fullname" . }}
+  labels:
+    {{- include "searxng.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "searxng.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "searxng.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "searxng.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        - name: render-template
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: docker.io/busybox:1.37
+          command:
+            - /render/render.sh
+          envFrom:
+            - secretRef:
+                name: {{ .Values.settings.secretKey.name }}
+            - secretRef:
+                name: {{ .Values.settings.openMetrics.name }}
+          volumeMounts:
+            - name: render-template
+              mountPath: /render/render.sh
+              subPath: render.sh
+              readOnly: true
+            - name: templates
+              mountPath: /render/settings.yml.template
+              subPath: settings.yml.template
+            - name: etc-searxng-settings
+              mountPath: /render/searxng
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: etc-searxng-settings
+              mountPath: /etc/searxng
+            - name: {{ include "searxng.fullname" . }}-cache
+              mountPath: /var/cache/searxng
+            - name: {{ include "searxng.fullname" . }}-tmp
+              mountPath: /tmp
+            - name: {{ include "searxng.fullname" . }}-certs
+              mountPath: /etc/ssl/certs
+          {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: render-template
+          configMap:
+            name: {{ include "searxng.fullname" . }}-render-script
+            defaultMode: 444
+            items:
+              - key: render.sh
+                path: render.sh
+        - name: templates
+          configMap:
+            name: {{ include "searxng.fullname" . }}-templates
+            defaultMode: 444
+        - name: etc-searxng-settings
+          emptyDir:
+            sizeLimit: 10Mi
+        - name: {{ include "searxng.fullname" . }}-cache
+          {{- if .Values.persistence.cache.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ if .Values.persistence.cache.claimName }}{{ .Values.persistence.cache.claimName }}{{- else }}{{ template "searxng.fullname" . }}-cache{{- end }}
+          {{- else }}
+          emptyDir:
+            sizeLimit: {{ .Values.persistence.cache.size }}
+          {{- end }}
+        - name: {{ include "searxng.fullname" . }}-tmp
+          emptyDir:
+            sizeLimit: 10Mi
+        - name: {{ include "searxng.fullname" . }}-certs
+          emptyDir:
+            sizeLimit: 10Mi
+      {{- with .Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
