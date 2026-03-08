@@ -33,6 +33,18 @@ entries:
     urls:
     - https://github.com/Enoxime/homelab-charts/releases/download/kavita-0.1.0/kavita-0.1.0.tgz
     version: 0.1.0
+  searxng:
+  - apiVersion: v2
+    appVersion: 2026.3.6-0716de6bc
+    created: "2026-03-08T03:40:58.248161488Z"
+    description: A Helm chart for Kubernetes
+    digest: 981b716f6bf450f8257f5e6f937973972671df6fab393e08e195ba58807c1f83
+    icon: https://github.com/searxng/searxng/blob/master/searx/static/themes/simple/img/favicon.png?raw=true
+    name: searxng
+    type: application
+    urls:
+    - https://github.com/Enoxime/homelab-charts/releases/download/searxng-0.1.0/searxng-0.1.0.tgz
+    version: 0.1.0
   tranga:
   - apiVersion: v2
     appVersion: 1.16.0
@@ -44,4 +56,4 @@ entries:
     urls:
     - https://github.com/Enoxime/homelab-charts/releases/download/tranga-0.1.0/tranga-0.1.0.tgz
     version: 0.1.0
-generated: "2026-01-29T03:48:11.263684081Z"
+generated: "2026-03-08T03:40:58.248175795Z"
