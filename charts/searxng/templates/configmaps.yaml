@@ -1,0 +1,133 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "searxng.fullname" . }}-render-script
+  labels:
+    {{- include "searxng.labels" . | nindent 4 }}
+data:
+  render.sh: |
+    #!/usr/bin/env sh
+
+    cp /render/settings.yml.template /render/searxng/settings.yml
+
+    sed -i "s/__SECRET_KEY__/${{ .Values.settings.secretKey.key }}/g" /render/searxng/settings.yml
+    sed -i "s/__OPENMETRICS_PASSWORD__/${{ .Values.settings.openMetrics.key }}/g" /render/searxng/settings.yml
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "searxng.fullname" . }}-templates
+  labels:
+    {{- include "searxng.labels" . | nindent 4 }}
+data:
+  settings.yml.template: |
+    {{- if or .Values.settings.engines.remove .Values.settings.engines.keepOnly }}
+    use_default_settings:
+      engines:
+        {{- with .Values.settings.engines.remove }}
+        remove:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.settings.engines.keepOnly }}
+        keep_only:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+    {{- else }}
+    use_default_settings: true
+    {{- end }}
+    {{- with .Values.settings.brand }}
+    brand:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.settings.engines.add }}
+    engines:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    general:
+      {{- toYaml .Values.settings.general | nindent 6 }}
+      {{- if .Values.settings.openMetrics }}
+      open_metrics: "__OPENMETRICS_PASSWORD__"
+      {{- end }}
+    search:
+      {{- toYaml .Values.settings.search | nindent 6 }}
+    server:
+      secret_key: "__SECRET_KEY__"
+      bind_address: "[::]"
+    {{- with .Values.settings.server }}
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.settings.ui }}
+    ui:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- if .Values.settings.valkey }}
+    valkey:
+      {{- if .Values.settings.valkey.username }}
+      url: valkey://{{ .Values.settings.valkey.username }}:__VALKEY_SECRET__@{{ .Values.settings.valkey.host }}:{{ .Values.settings.valkey.port }}/0
+      {{- else }}
+      url: valkey://{{ .Values.settings.valkey.host }}:{{ .Values.settings.valkey.port }}/0
+      {{- end }}
+    {{- end }}
+  
+{{- if .Values.limiter.enabled }}
+  limiter.toml.template: |
+    [botdetection]
+
+    # The prefix defines the number of leading bits in an address that are compared
+    # to determine whether or not an address is part of a (client) network.
+
+    ipv4_prefix = {{ .Values.limiter.ipv4Prefix }}
+    ipv6_prefix = {{ .Values.limiter.ipv6Prefix }}
+
+    # If the request IP is in trusted_proxies list, the client IP address is
+    # extracted from the X-Forwarded-For and X-Real-IP headers. This should be
+    # used if SearXNG is behind a reverse proxy or load balancer.
+
+    trusted_proxies = [
+      '127.0.0.0/8',
+      '::1',
+      # '192.168.0.0/16',
+      # '172.16.0.0/12',
+      # '10.0.0.0/8',
+      # 'fd00::/8',
+      {{- range .Values.limiter.trustedProxies }}
+      '{{ . }}',
+      {{- end }}
+    ]
+
+    [botdetection.ip_limit]
+
+    # To get unlimited access in a local network, by default link-local addresses
+    # (networks) are not monitored by the ip_limit
+    filter_link_local = {{ .Values.limiter.filterLinkLocal }}
+
+    # activate link_token method in the ip_limit method
+    link_token = {{ .Values.limiter.linkToken }}
+
+    [botdetection.ip_lists]
+
+    # In the limiter, the ip_lists method has priority over all other methods -> if
+    # an IP is in the pass_ip list, it has unrestricted access and it is also not
+    # checked if e.g. the "user agent" suggests a bot (e.g. curl).
+
+    block_ip = [
+      # '93.184.216.34',  # IPv4 of example.org
+      # '257.1.1.1',      # invalid IP --> will be ignored, logged in ERROR class
+      {{- range .Values.limiter.blockIp }}
+      '{{ . }}',
+      {{- end }}
+    ]
+
+    pass_ip = [
+      # '192.168.0.0/16',      # IPv4 private network
+      # 'fe80::/10'            # IPv6 linklocal / wins over botdetection.ip_limit.filter_link_local
+      {{- range .Values.limiter.passIp }}
+      '{{ . }}',
+      {{- end }}
+    ]
+
+    # Activate passlist of (hardcoded) IPs from the SearXNG organization,
+    # e.g. `check.searx.space`.
+    pass_searxng_org = {{ .Values.limiter.passSearxngOrg }}
+{{- end }}
