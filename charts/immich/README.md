@@ -1,6 +1,6 @@
 # immich
 
-![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.4.1](https://img.shields.io/badge/AppVersion-v2.4.1-informational?style=flat-square)
+![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v3.2.4](https://img.shields.io/badge/AppVersion-v3.2.4-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -9,10 +9,15 @@ A Helm chart for Kubernetes
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
+| ai.deployRemoteMLOnly.enabled | bool | `false` |  |
+| ai.enabled | bool | `false` |  |
 | ai.image.pullPolicy | string | `"IfNotPresent"` |  |
 | ai.image.repository | string | `"ghcr.io/immich-app/immich-machine-learning"` |  |
 | ai.image.tag | string | `""` |  |
 | ai.nodeSelector | object | `{}` |  |
+| ai.persistence.cacheSize | string | `"50Gi"` |  |
+| ai.persistence.configSize | string | `"1Gi"` |  |
+| ai.persistence.storageClassName | string | `""` |  |
 | ai.podSecurityContext | object | `{}` |  |
 | ai.replicaCount | int | `1` |  |
 | ai.resources | object | `{}` |  |
@@ -29,6 +34,7 @@ A Helm chart for Kubernetes
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
 | fullnameOverride | string | `""` |  |
+| httpRoute | object | `{"annotations":{},"enabled":false,"hostnames":["chart-example.local"],"parentRefs":[{"name":"gateway","sectionName":"http"}],"rules":[{"matches":[{"path":{"type":"PathPrefix","value":"/headers"}}]}]}` | Expose the service via gateway-api HTTPRoute Requires Gateway API resources and suitable controller installed within the cluster (see: https://gateway-api.sigs.k8s.io/guides/) |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"ghcr.io/immich-app/immich-server"` |  |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
@@ -40,7 +46,7 @@ A Helm chart for Kubernetes
 | ingress.hosts[0].paths[0].path | string | `"/"` |  |
 | ingress.hosts[0].paths[0].pathType | string | `"Prefix"` |  |
 | ingress.tls | list | `[]` |  |
-| ipp | object | `{"config":{"allowDownloadAll":1,"downloadOriginalPhoto":true,"enabled":false,"singleImageGallery":false},"enabled":false,"image":{"pullPolicy":"IfNotPresent","repository":"alangrainger/immich-public-proxy","tag":"1.14.2"},"podSecurityContext":{},"publicBaseUrl":{"enabled":false,"url":""},"resources":{},"securityContext":{},"service":{"port":3000,"type":"ClusterIP"},"volumeMounts":[],"volumes":[]}` | Activate immich-public-proxy |
+| ipp | object | `{"config":{"allowDownloadAll":1,"downloadOriginalPhoto":true,"enabled":false,"singleImageGallery":false},"enabled":false,"image":{"pullPolicy":"IfNotPresent","repository":"alangrainger/immich-public-proxy","tag":"1.15.1"},"podSecurityContext":{},"publicBaseUrl":{"enabled":false,"url":""},"resources":{},"securityContext":{},"service":{"port":3000,"type":"ClusterIP"},"volumeMounts":[],"volumes":[]}` | Activate immich-public-proxy |
 | ipp.publicBaseUrl.url | string | `""` | http(s)?://public-domain.com |
 | microservices.nodeSelector | object | `{}` |  |
 | microservices.resources | object | `{}` |  |
@@ -50,6 +56,9 @@ A Helm chart for Kubernetes
 | microservices.volumeMounts | list | `[]` |  |
 | microservices.volumes | list | `[]` |  |
 | nameOverride | string | `""` |  |
+| network.dualStack.enabled | bool | `false` |  |
+| network.dualStack.ipFamilyPolicy | string | `"RequireDualStack"` |  |
+| network.dualStack.ipv6First | bool | `true` |  |
 | nodeSelector | object | `{}` |  |
 | persistence.enabled | bool | `false` |  |
 | persistence.library.enabled | bool | `false` |  |

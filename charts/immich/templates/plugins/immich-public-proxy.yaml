@@ -1,3 +1,4 @@
+{{- if not .Values.ai.deployRemoteMLOnly.enabled -}}
 {{- if .Values.ipp.enabled }}
 apiVersion: apps/v1
 kind: Deployment
@@ -103,4 +104,5 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+{{- end }}
 {{- end }}

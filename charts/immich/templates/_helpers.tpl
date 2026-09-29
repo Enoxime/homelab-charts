@@ -60,3 +60,21 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+IP stack
+*/}}
+{{- define "immich.networkStack" -}}
+{{- if .Values.network.dualStack.enabled }}
+ipFamilyPolicy: {{ .Values.network.dualStack.ipFamilyPolicy }}
+{{- if .Values.network.dualStack.ipv6First }}
+ipFamilies:
+  - IPv6
+  - IPv4
+{{- else }}
+ipFamilies:
+  - IPv4
+  - IPv6
+{{- end }}
+{{- end }}
+{{- end }}
