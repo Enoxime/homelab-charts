@@ -1,3 +1,4 @@
+{{- if not .Values.ai.deployRemoteMLOnly.enabled -}}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -39,7 +40,6 @@ metadata:
 data:
   IMMICH_ENV: production
   IMMICH_LOG_LEVEL: log
-  IMMICH_MACHINE_LEARNING_URL: http://{{ include "immich.fullname" . }}-ai:3003
   IMMICH_METRICS: "true"
 ---
 apiVersion: v1
@@ -80,4 +80,5 @@ data:
           "downloadOriginalPhoto" .Values.ipp.config.downloadOriginalPhoto
           "allowDownloadAll" .Values.ipp.config.allowDownloadAll
         )) | nindent 4 }}
+{{- end }}
 {{- end }}

@@ -1,3 +1,4 @@
+{{- if not .Values.ai.deployRemoteMLOnly.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -6,9 +7,6 @@ metadata:
     type: immich-microsvc
     {{- include "immich.labels" . | nindent 4 }}
 spec:
-  {{- if and .Values.microservices.runtimeClass.enabled .Values.microservices.runtimeClass.name }}
-  runtimeClassName: {{ .Values.microservices.runtimeClass.name }}
-  {{- end }}
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
@@ -30,6 +28,9 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
+      {{- if and .Values.microservices.runtimeClass.enabled .Values.microservices.runtimeClass.name }}
+      runtimeClassName: {{ .Values.microservices.runtimeClass.name }}
+      {{- end }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -111,3 +112,4 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+{{- end }}

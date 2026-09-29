@@ -1,3 +1,4 @@
+{{- if .Values.ai.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -44,27 +45,12 @@ spec:
           image: "{{ .Values.ai.image.repository }}:{{ .Values.ai.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.ai.image.pullPolicy }}
           env:
-            {{- if not (empty .Values.redis.password) }}
-            - name: REDIS_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.redis.password.name }}
-                  key: {{ .Values.redis.password.key }}
-            {{- end }}
-            {{- if not (empty .Values.postgresql.password) }}
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.postgresql.password.name }}
-                  key: {{ .Values.postgresql.password.key }}
-            {{- end }}
-          envFrom:
-            - configMapRef:
-                name: {{ include "immich.fullname" . }}-redis-env
-            - configMapRef:
-                name: {{ include "immich.fullname" . }}-database-env
-            - configMapRef:
-                name: {{ include "immich.fullname" . }}-global-env
+            - name: TRANSFORMERS_CACHE
+              value: /cache
+            - name: HF_XET_CACHE
+              value: /cache/huggingface-xet
+            - name: MPLCONFIGDIR
+              value: /cache/matplotlib-config
           ports:
             - name: http-ai
               containerPort: {{ .Values.ai.service.port }}
@@ -133,3 +119,4 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+{{- end }}
