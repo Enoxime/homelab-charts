@@ -3,6 +3,16 @@ entries:
   immich:
   - apiVersion: v2
     appVersion: v3.2.4
+    created: "2026-09-29T19:51:38.760951631Z"
+    description: A Helm chart for Kubernetes
+    digest: bb108edb2cf0e344f7a49e6f7a2fb1a2f9fb046d15fd8ec8b8244fd987092b95
+    name: immich
+    type: application
+    urls:
+    - https://github.com/Enoxime/homelab-charts/releases/download/immich-1.0.1/immich-1.0.1.tgz
+    version: 1.0.1
+  - apiVersion: v2
+    appVersion: v3.2.4
     created: "2026-09-29T01:46:04.781230326Z"
     description: A Helm chart for Kubernetes
     digest: 170cd597210e954596086b113d948a434250c5de75a96ae0a074bbdacf414875
@@ -66,4 +76,4 @@ entries:
     urls:
     - https://github.com/Enoxime/homelab-charts/releases/download/tranga-0.1.0/tranga-0.1.0.tgz
     version: 0.1.0
-generated: "2026-09-29T01:46:04.781246676Z"
+generated: "2026-09-29T19:51:38.760973882Z"
