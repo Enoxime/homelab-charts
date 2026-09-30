@@ -100,7 +100,12 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
-timezone: "*1"
+timezone: "UTC"
+
+monitoring:
+  enabled: false
+  serviceMonitor:
+    enabled: false
 
 autoscaling:
   enabled: false

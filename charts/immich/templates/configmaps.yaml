@@ -54,6 +54,9 @@ data:
   {{- end }}
   # see: https://immich.app/docs/administration/jobs-workers/
   IMMICH_WORKERS_INCLUDE: api
+  {{- if .Values.monitoring.enabled }}
+  IMMICH_TELEMETRY_INCLUDE: all
+  {{- end }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -65,8 +68,11 @@ data:
   TZ: {{ .Values.timezone | quote }}
   # see: https://immich.app/docs/administration/jobs-workers/
   IMMICH_WORKERS_EXCLUDE: api
-{{- if and .Values.ipp.enabled .Values.ipp.config.enabled }}
+  {{- if .Values.monitoring.enabled }}
+  IMMICH_TELEMETRY_INCLUDE: all
+  {{- end }}
 ---
+{{- if and .Values.ipp.enabled .Values.ipp.config.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:

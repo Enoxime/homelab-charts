@@ -1,6 +1,6 @@
 # immich
 
-![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v3.2.4](https://img.shields.io/badge/AppVersion-v3.2.4-informational?style=flat-square)
+![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v3.2.4](https://img.shields.io/badge/AppVersion-v3.2.4-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -55,6 +55,8 @@ A Helm chart for Kubernetes
 | microservices.tolerations | list | `[]` |  |
 | microservices.volumeMounts | list | `[]` |  |
 | microservices.volumes | list | `[]` |  |
+| monitoring.enabled | bool | `false` |  |
+| monitoring.serviceMonitor.enabled | bool | `false` |  |
 | nameOverride | string | `""` |  |
 | network.dualStack.enabled | bool | `false` |  |
 | network.dualStack.ipFamilyPolicy | string | `"RequireDualStack"` |  |
@@ -100,7 +102,7 @@ A Helm chart for Kubernetes
 | serviceAccount.automount | bool | `true` | Automatically mount a ServiceAccount's API credentials? |
 | serviceAccount.create | bool | `false` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
-| timezone | string | `"*1"` |  |
+| timezone | string | `"UTC"` |  |
 | tolerations | list | `[]` |  |
 | volumeMounts | list | `[]` | Additional volumeMounts on the output Deployment definition. |
 | volumes | list | `[]` | Additional volumes on the output Deployment definition. |

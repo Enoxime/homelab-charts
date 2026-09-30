@@ -18,6 +18,50 @@ spec:
     type: immich-server
     {{- include "immich.selectorLabels" . | nindent 4 }}
 ---
+{{- if .Values.monitoring.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "immich.fullname" . }}-server-api-metrics
+  labels:
+    type: immich-metrics
+    worker: api
+    {{- include "immich.labels" . | nindent 4 }}
+spec:
+  {{- include "immich.networkStack" . | nindent 2 }}
+  type: ClusterIP
+  ports:
+    - port: 8081
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    type: immich-metrics
+    worker: api
+    {{- include "immich.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "immich.fullname" . }}-microservice-metrics
+  labels:
+    type: immich-metrics
+    worker: microsevices
+    {{- include "immich.labels" . | nindent 4 }}
+spec:
+  {{- include "immich.networkStack" . | nindent 2 }}
+  type: ClusterIP
+  ports:
+    - port: 8082
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    type: immich-metrics
+    worker: microsevices
+    {{- include "immich.selectorLabels" . | nindent 4 }}
+{{- end }}
+---
 {{- if .Values.ipp.enabled }}
 apiVersion: v1
 kind: Service

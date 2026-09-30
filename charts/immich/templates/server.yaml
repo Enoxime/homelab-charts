@@ -69,6 +69,11 @@ spec:
             - name: http
               containerPort: {{ .Values.server.service.port }}
               protocol: TCP
+            {{- if .Values.monitoring.enabled }}
+            - name: metrics
+              containerPort: 8081
+              protocol: TCP
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /api/server/ping
