@@ -68,6 +68,12 @@ spec:
                 name: {{ include "immich.fullname" . }}-global-env
             - configMapRef:
                 name: {{ include "immich.fullname" . }}-microservices-env
+          {{- if .Values.monitoring.enabled }}
+          ports:
+            - name: metrics
+              containerPort: 8082
+              protocol: TCP
+          {{- end }}
           resources:
             {{- toYaml .Values.microservices.resources | nindent 12 }}
           volumeMounts:

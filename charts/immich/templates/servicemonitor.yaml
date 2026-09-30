@@ -1,0 +1,42 @@
+{{- if and (not .Values.ai.deployRemoteMLOnly.enabled) .Values.monitoring.enabled .Values.monitoring.serviceMonitor.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    {{- include "immich.labels" . | nindent 4 }}
+  name: {{ include "immich.fullname" . }}-server-api
+spec:
+  endpoints:
+    - interval: 10s
+      path: /metrics
+      port: metrics
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      type: immich-metrics
+      worker: api
+      {{- include "immich.selectorLabels" . | nindent 4 }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    {{- include "immich.labels" . | nindent 4 }}
+  name: {{ include "immich.fullname" . }}-server-microsevices
+spec:
+  endpoints:
+    - interval: 10s
+      path: /metrics
+      port: metrics
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      type: immich-metrics
+      worker: microsevices
+      {{- include "immich.selectorLabels" . | nindent 4 }}
+{{- end }}
