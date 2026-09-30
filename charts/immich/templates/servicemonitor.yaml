@@ -18,7 +18,7 @@ spec:
     matchLabels:
       type: immich-metrics
       worker: api
-      {{- include "immich.selectorLabels" . | nindent 4 }}
+      {{- include "immich.selectorLabels" . | nindent 6 }}
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -38,5 +38,5 @@ spec:
     matchLabels:
       type: immich-metrics
       worker: microsevices
-      {{- include "immich.selectorLabels" . | nindent 4 }}
+      {{- include "immich.selectorLabels" . | nindent 6 }}
 {{- end }}
