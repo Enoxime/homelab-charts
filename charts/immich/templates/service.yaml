@@ -36,8 +36,7 @@ spec:
       protocol: TCP
       name: metrics
   selector:
-    type: immich-metrics
-    worker: api
+    type: immich-server
     {{- include "immich.selectorLabels" . | nindent 4 }}
 ---
 apiVersion: v1
