@@ -45,7 +45,7 @@ metadata:
   name: {{ include "immich.fullname" . }}-microservice-metrics
   labels:
     type: immich-metrics
-    worker: microsevices
+    worker: microservices
     {{- include "immich.labels" . | nindent 4 }}
 spec:
   {{- include "immich.networkStack" . | nindent 2 }}
@@ -56,8 +56,7 @@ spec:
       protocol: TCP
       name: metrics
   selector:
-    type: immich-metrics
-    worker: microsevices
+    type: immich-microsvc
     {{- include "immich.selectorLabels" . | nindent 4 }}
 {{- end }}
 ---
