@@ -71,6 +71,7 @@ data:
   {{- if .Values.monitoring.enabled }}
   IMMICH_TELEMETRY_INCLUDE: all
   {{- end }}
+  MACHINE_LEARNING_MODEL_REVISION: v2
 ---
 {{- if and .Values.ipp.enabled .Values.ipp.config.enabled }}
 apiVersion: v1
