@@ -207,9 +207,7 @@ ipp:
     url: ""
   config:
     enabled: false
-    singleImageGallery: false
-    downloadOriginalPhoto: true
-    allowDownloadAll: 1
+    ipp: {}
   service:
     type: ClusterIP
     port: 3000

@@ -1,6 +1,6 @@
 # immich
 
-![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v3.3.0](https://img.shields.io/badge/AppVersion-v3.3.0-informational?style=flat-square)
+![Version: 1.2.1](https://img.shields.io/badge/Version-1.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v3.3.0](https://img.shields.io/badge/AppVersion-v3.3.0-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -46,7 +46,7 @@ A Helm chart for Kubernetes
 | ingress.hosts[0].paths[0].path | string | `"/"` |  |
 | ingress.hosts[0].paths[0].pathType | string | `"Prefix"` |  |
 | ingress.tls | list | `[]` |  |
-| ipp | object | `{"config":{"allowDownloadAll":1,"downloadOriginalPhoto":true,"enabled":false,"singleImageGallery":false},"enabled":false,"image":{"pullPolicy":"IfNotPresent","repository":"alangrainger/immich-public-proxy","tag":"1.15.1"},"podSecurityContext":{},"publicBaseUrl":{"enabled":false,"url":""},"resources":{},"securityContext":{},"service":{"port":3000,"type":"ClusterIP"},"volumeMounts":[],"volumes":[]}` | Activate immich-public-proxy |
+| ipp | object | `{"config":{"enabled":false,"ipp":{}},"enabled":false,"image":{"pullPolicy":"IfNotPresent","repository":"alangrainger/immich-public-proxy","tag":"1.15.1"},"podSecurityContext":{},"publicBaseUrl":{"enabled":false,"url":""},"resources":{},"securityContext":{},"service":{"port":3000,"type":"ClusterIP"},"volumeMounts":[],"volumes":[]}` | Activate immich-public-proxy |
 | ipp.publicBaseUrl.url | string | `""` | http(s)?://public-domain.com |
 | microservices.nodeSelector | object | `{}` |  |
 | microservices.resources | object | `{}` |  |
