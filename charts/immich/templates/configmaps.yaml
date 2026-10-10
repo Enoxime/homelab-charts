@@ -71,6 +71,7 @@ data:
   {{- if .Values.monitoring.enabled }}
   IMMICH_TELEMETRY_INCLUDE: all
   {{- end }}
+  MACHINE_LEARNING_MODEL_REVISION: v2
 ---
 {{- if and .Values.ipp.enabled .Values.ipp.config.enabled }}
 apiVersion: v1
@@ -81,10 +82,6 @@ metadata:
     {{- include "immich.labels" . | nindent 4 }}
 data:
   config.json: |
-    {{- toJson (dict "ipp" (dict
-          "singleImageGallery" .Values.ipp.config.singleImageGallery
-          "downloadOriginalPhoto" .Values.ipp.config.downloadOriginalPhoto
-          "allowDownloadAll" .Values.ipp.config.allowDownloadAll
-        )) | nindent 4 }}
+    {{- toJson (dict "ipp" .Values.ipp.config.ipp) | nindent 4 }}
 {{- end }}
 {{- end }}
